@@ -297,11 +297,14 @@ distro_name['focal']="Ubuntu Focal 20.04 LTS"
 distro_support['focal']="supported"
 distro_name['groovy']="Ubuntu Groovy 20.10"
 distro_support['groovy']="csc"
+distro_name['jammy']="Ubuntu Jammy 22.04"
+distro_support['jammy']="csc"
 
 if [[ $KERNEL_ONLY != yes && -z $RELEASE ]]; then
 
 	options=()
 
+    distro_menu "jammy"
 		distro_menu "focal"
 		distro_menu "buster"
 		distro_menu "bionic"

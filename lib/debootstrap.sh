@@ -36,16 +36,11 @@ debootstrap_ng()
 	rm -rf $SDCARD $MOUNT
 	mkdir -p $SDCARD $MOUNT $DEST/images $SRC/cache/rootfs
 
-	# bind mount rootfs if defined
-	if [[ -d "${ARMBIAN_CACHE_ROOTFS_PATH}" ]]; then
-		mountpoint -q "${SRC}"/cache/rootfs && umount -l "${SRC}"/cache/toolchain
-		mount --bind "${ARMBIAN_CACHE_ROOTFS_PATH}" "${SRC}"/cache/rootfs
-	fi
-
 	# stage: verify tmpfs configuration and mount
-	# CLI needs ~1.5GiB, desktop - ~3.5GiB
-	# calculate and set tmpfs mount to use 9/10 of available RAM+SWAP
-	local phymem=$(( (($(awk '/MemTotal/ {print $2}' /proc/meminfo) + $(awk '/SwapTotal/ {print $2}' /proc/meminfo))) / 1024 * 9 / 10 )) # MiB
+	# default maximum size for tmpfs mount is 1/2 of available RAM
+	# CLI needs ~1.2GiB+ (Xenial CLI), Desktop - ~2.8GiB+ (Xenial Desktop w/o HW acceleration)
+	# calculate and set tmpfs mount to use 2/3 of available RAM
+	local phymem=$(( $(awk '/MemTotal/ {print $2}' /proc/meminfo) / 1024 * 2 / 3 )) # MiB
 	if [[ $BUILD_DESKTOP == yes ]]; then local tmpfs_max_size=3500; else local tmpfs_max_size=1500; fi # MiB
 	if [[ $FORCE_USE_RAMDISK == no ]]; then	local use_tmpfs=no
 	elif [[ $FORCE_USE_RAMDISK == yes || $phymem -gt $tmpfs_max_size ]]; then
@@ -58,11 +53,6 @@ debootstrap_ng()
 	# stage: prepare basic rootfs: unpack cache or create from scratch
 	create_rootfs_cache
 
-	call_extension_method "pre_install_distribution_specific" "config_pre_install_distribution_specific" << 'PRE_INSTALL_DISTRIBUTION_SPECIFIC'
-*give config a chance to act before install_distribution_specific*
-Called after `create_rootfs_cache` (_prepare basic rootfs: unpack cache or create from scratch_) but before `install_distribution_specific` (_install distribution and board specific applications_).
-PRE_INSTALL_DISTRIBUTION_SPECIFIC
-
 	# stage: install kernel and u-boot packages
 	# install distribution and board specific applications
 
@@ -70,10 +60,10 @@ PRE_INSTALL_DISTRIBUTION_SPECIFIC
 	install_common
 
 	# install locally built packages
-	[[ $EXTERNAL_NEW == compile ]] && chroot_installpackages_local
+	[[ $EXTERNAL_NEW == compile ]] && chroot_installpackages_local >> "${DEST}"/debug/install.log 2>&1
 
 	# install from apt.armbian.com
-	[[ $EXTERNAL_NEW == prebuilt ]] && chroot_installpackages "yes"
+	[[ $EXTERNAL_NEW == prebuilt ]] && chroot_installpackages "yes" >> "${DEST}"/debug/install.log 2>&1
 
 	# stage: user customization script
 	# NOTE: installing too many packages may fill tmpfs mount

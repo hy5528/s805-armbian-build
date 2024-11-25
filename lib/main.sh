@@ -552,23 +552,16 @@ fi
 [[ $EXTERNAL_NEW == compile ]] && chroot_build_packages
 
 if [[ $KERNEL_ONLY != yes ]]; then
-
 	[[ $BSP_BUILD != yes ]] && debootstrap_ng
-
 else
-
 	display_alert "Kernel build done" "@host" "info"
 	display_alert "Target directory" "${DEB_STORAGE}/" "info"
 	display_alert "File name" "${CHOSEN_KERNEL}_${REVISION}_${ARCH}.deb" "info"
-
 fi
 
-call_extension_method "run_after_build"  << 'RUN_AFTER_BUILD'
-*hook for function to run after build, i.e. to change owner of `$SRC`*
-Really one of the last hooks ever called. The build has ended. Congratulations.
-- *NOTE:* this will run only if there were no errors during build process.
-RUN_AFTER_BUILD
-
+# hook for function to run after build, i.e. to change owner of $SRC
+# NOTE: this will run only if there were no errors during build process
+[[ $(type -t run_after_build) == function ]] && run_after_build || true
 
 end=$(date +%s)
 runtime=$(((end-start)/60))
@@ -582,10 +575,6 @@ $([[ -n $BUILD_MINIMAL ]] && echo "BUILD_MINIMAL=${BUILD_MINIMAL} ")\
 $([[ -n $BUILD_DESKTOP ]] && echo "BUILD_DESKTOP=${BUILD_DESKTOP} ")\
 $([[ -n $KERNEL_ONLY ]] && echo "KERNEL_ONLY=${KERNEL_ONLY} ")\
 $([[ -n $KERNEL_CONFIGURE ]] && echo "KERNEL_CONFIGURE=${KERNEL_CONFIGURE} ")\
-$([[ -n $DESKTOP_ENVIRONMENT ]] && echo "DESKTOP_ENVIRONMENT=${DESKTOP_ENVIRONMENT} ")\
-$([[ -n $DESKTOP_ENVIRONMENT_CONFIG_NAME  ]] && echo "DESKTOP_ENVIRONMENT_CONFIG_NAME=${DESKTOP_ENVIRONMENT_CONFIG_NAME} ")\
-$([[ -n $DESKTOP_APPGROUPS_SELECTED ]] && echo "DESKTOP_APPGROUPS_SELECTED=\"${DESKTOP_APPGROUPS_SELECTED}\" ")\
-$([[ -n $DESKTOP_APT_FLAGS_SELECTED ]] && echo "DESKTOP_APT_FLAGS_SELECTED=\"${DESKTOP_APT_FLAGS_SELECTED}\" ")\
 $([[ -n $COMPRESS_OUTPUTIMAGE ]] && echo "COMPRESS_OUTPUTIMAGE=${COMPRESS_OUTPUTIMAGE} ")\
 " "ext"
 

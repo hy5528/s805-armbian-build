@@ -60,14 +60,4 @@ burnimg=$diskimg.burn.img
 sudo ./output/amlimg/AmlImg pack $burnimg output/amlimg/
 echo "complete! File:$burnimg"
 
-#打包为卡刷升级镜像
 
-sdimg=$diskimg.sdupdate.zip
-
-#sudo cp output/amlimg/boot.simg /mnt && sudo cp output/amlimg/rootfs.simg /mnt
-sudo cp -f userpatches/ReadMe.txt output/amlimg/
-sudo mkimage -C none -A arm -T script -d userpatches/sdburning.ini output/amlimg/boot.scr 
-cd output/amlimg && sudo zip ../../$sdimg boot.scr  boot.simg rootfs.simg ReadMe.txt
-echo "complete! File:$sdimg"
-sudo rm -r /tmp/amlimg
-#pixz -9 <$burnimg >${burnimg}.xz

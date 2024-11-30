@@ -5,7 +5,6 @@
 
 setenv load_addr "0x300000"
 # default values
-setenv overlay_error "false"
 setenv rootdev "/dev/mmcblk0p1"
 setenv rootfstype "ext4"
 setenv verbosity "1"

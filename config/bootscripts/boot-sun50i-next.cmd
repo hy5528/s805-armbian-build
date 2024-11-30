@@ -5,7 +5,6 @@
 
 # default values
 setenv load_addr "0x45000000"
-setenv overlay_error "false"
 setenv rootdev "/dev/mmcblk0p1"
 setenv verbosity "1"
 setenv rootfstype "ext4"
@@ -27,11 +26,7 @@ fi
 
 if test "${console}" = "display" || test "${console}" = "both"; then setenv consoleargs "console=ttyS0,115200 console=tty1"; fi
 if test "${console}" = "serial"; then setenv consoleargs "console=ttyS0,115200"; fi
-if test "${bootlogo}" = "true"; then
-	setenv consoleargs "splash plymouth.ignore-serial-consoles ${consoleargs}"
-else
-	setenv consoleargs "splash=verbose ${consoleargs}"
-fi
+if test "${bootlogo}" = "true"; then setenv consoleargs "bootsplash.bootfile=bootsplash.armbian ${consoleargs}"; fi
 
 # get PARTUUID of first partition on SD/eMMC it was loaded from
 # mmc 0 is always mapped to device u-boot (2016.09+) was loaded from

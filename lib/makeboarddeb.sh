@@ -31,29 +31,30 @@ create_board_package()
 	copy_all_packages_files_for "bsp-cli"
 
 	# install copy of boot script & environment file
-	if [[ -n "${BOOTSCRIPT}" ]]; then
+	if [[ "${BOOTCONFIG}" != "none" ]]; then
 		# @TODO: add extension method bsp_prepare_bootloader(), refactor into u-boot extension
 		local bootscript_src=${BOOTSCRIPT%%:*}
 		local bootscript_dst=${BOOTSCRIPT##*:}
 		mkdir -p "${destination}"/usr/share/armbian/
 	
-		if [ -f "${USERPATCHES_PATH}/bootscripts/${bootscript_src}" ]; then
-			cp "${USERPATCHES_PATH}/bootscripts/${bootscript_src}" "${destination}/usr/share/armbian/${bootscript_dst}"
-		else
-			cp "${SRC}/config/bootscripts/${bootscript_src}" "${destination}/usr/share/armbian/${bootscript_dst}"
+		# create extlinux config file
+		if [[ $SRC_EXTLINUX != yes ]]; then
+			if [ -f "${USERPATCHES_PATH}/bootscripts/${bootscript_src}" ]; then
+			  cp "${USERPATCHES_PATH}/bootscripts/${bootscript_src}" "${destination}/usr/share/armbian/${bootscript_dst}"
+			else
+			  cp "${SRC}/config/bootscripts/${bootscript_src}" "${destination}/usr/share/armbian/${bootscript_dst}"
+			fi
+			[[ -n $BOOTENV_FILE && -f $SRC/config/bootenv/$BOOTENV_FILE ]] && \
+				cp "${SRC}/config/bootenv/${BOOTENV_FILE}" "${destination}"/usr/share/armbian/armbianEnv.txt
 		fi
-
-		if [[ -n $BOOTENV_FILE && -f $SRC/config/bootenv/$BOOTENV_FILE ]]; then
-			cp "${SRC}/config/bootenv/${BOOTENV_FILE}" "${destination}"/usr/share/armbian/armbianEnv.txt
+	
+		# add configuration for setting uboot environment from userspace with: fw_setenv fw_printenv
+		if [[ -n $UBOOT_FW_ENV ]]; then
+			UBOOT_FW_ENV=($(tr ',' ' ' <<< "$UBOOT_FW_ENV"))
+			mkdir -p "${destination}"/etc
+			echo "# Device to access      offset           env size" > "${destination}"/etc/fw_env.config
+			echo "/dev/mmcblk0	${UBOOT_FW_ENV[0]}	${UBOOT_FW_ENV[1]}" >> "${destination}"/etc/fw_env.config
 		fi
-	fi
-
-	# add configuration for setting uboot environment from userspace with: fw_setenv fw_printenv
-	if [[ -n $UBOOT_FW_ENV ]]; then
-		UBOOT_FW_ENV=($(tr ',' ' ' <<< "$UBOOT_FW_ENV"))
-		mkdir -p "${destination}"/etc
-		echo "# Device to access      offset           env size" > "${destination}"/etc/fw_env.config
-		echo "/dev/mmcblk0	${UBOOT_FW_ENV[0]}	${UBOOT_FW_ENV[1]}" >> "${destination}"/etc/fw_env.config
 	fi
 
 	# Replaces: base-files is needed to replace /etc/update-motd.d/ files on Xenial

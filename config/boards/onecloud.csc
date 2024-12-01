@@ -1,6 +1,7 @@
 # Amlogic S805 quad core 1GB RAM SoC GBE
 BOARD_NAME="OneCloud"
 BOARDFAMILY="meson8b"
+BOARD_DIR=packages/bsp/linux-meson-edge
 KERNEL_TARGET="legacy,current,edge"
 
 BOOTCONFIG="none"

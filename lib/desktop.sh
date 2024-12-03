@@ -62,7 +62,6 @@ create_desktop_package ()
 	Priority: optional
 	Recommends: ${DEBIAN_RECOMMENDS//[:space:]+/,}, armbian-bsp-desktop
 	Provides: ${CHOSEN_DESKTOP}, armbian-${RELEASE}-desktop
-	Conflicts: gdm3
 	Pre-Depends: ${PACKAGE_LIST_PREDEPENDS//[:space:]+/,}
 	Description: Armbian desktop for ${DISTRIBUTION} ${RELEASE}
 	EOF

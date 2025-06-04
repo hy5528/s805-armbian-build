@@ -246,7 +246,7 @@ create_sources_list()
 
 	# stage: add armbian repository and install key
 	if [[ $DOWNLOAD_MIRROR == "china" ]]; then
-		echo "deb ${SIGNED_BY}https://deb.debian.org/armbian $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" > "${basedir}"/etc/apt/sources.list.d/armbian.list
+		echo "deb ${SIGNED_BY}https://mirrors.tuna.tsinghua.edu.cn/armbian $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" > "${basedir}"/etc/apt/sources.list.d/armbian.list
 	elif [[ $DOWNLOAD_MIRROR == "bfsu" ]]; then
 	    echo "deb ${SIGNED_BY}http://mirrors.bfsu.edu.cn/armbian $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" > "${basedir}"/etc/apt/sources.list.d/armbian.list
 	else
@@ -261,7 +261,6 @@ create_sources_list()
 		display_alert "Disabling armbian repo" "${ARCH}-${RELEASE}" "wrn"
 		mv "${SDCARD}"/etc/apt/sources.list.d/armbian.list "${SDCARD}"/etc/apt/sources.list.d/armbian.list.disabled
 	fi
-
 }
 
 

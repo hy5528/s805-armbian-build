@@ -246,7 +246,7 @@ create_sources_list()
 
 	# stage: add armbian repository and install key
 	if [[ $DOWNLOAD_MIRROR == "china" ]]; then
-		echo "deb ${SIGNED_BY}https://mirrors.tuna.tsinghua.edu.cn/armbian $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" > "${basedir}"/etc/apt/sources.list.d/armbian.list
+		echo "deb ${SIGNED_BY}https://deb.debian.org/armbian $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" > "${basedir}"/etc/apt/sources.list.d/armbian.list
 	elif [[ $DOWNLOAD_MIRROR == "bfsu" ]]; then
 	    echo "deb ${SIGNED_BY}http://mirrors.bfsu.edu.cn/armbian $RELEASE main ${RELEASE}-utils ${RELEASE}-desktop" > "${basedir}"/etc/apt/sources.list.d/armbian.list
 	else
@@ -1648,11 +1648,11 @@ function webseed ()
 	# when selecting china mirrors, use only China mirror, others are very slow there
 	if [[ $DOWNLOAD_MIRROR == china ]]; then
 		WEBSEED=(
-		https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/
+		https://deb.debian.org/armbian-releases/
 		)
 	elif [[ $DOWNLOAD_MIRROR == bfsu ]]; then
 		WEBSEED=(
-		https://mirrors.bfsu.edu.cn/armbian-releases/
+		https://mirrors.bfsu.edu.cn/armbian-releases/onecloud/
 		)
 	fi
 
@@ -1677,9 +1677,9 @@ download_and_verify()
 	[[ -z $DISABLE_IPV6 ]] && DISABLE_IPV6="true"
 
         if [[ $DOWNLOAD_MIRROR == china ]]; then
-			local server="https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/"
+			local server="https://deb.debian.org/armbian-releases/"
 		elif [[ $DOWNLOAD_MIRROR == bfsu ]]; then
-			local server="https://mirrors.bfsu.edu.cn/armbian-releases/"
+			local server="https://mirrors.bfsu.edu.cn/armbian-releases/onecloud/"
 		else
 			local server=${ARMBIAN_MIRROR}
         fi
@@ -1698,13 +1698,13 @@ download_and_verify()
 	timeout 10 curl --location --head --fail --silent ${server}${remotedir}/${filename} 2>&1 >/dev/null
 	if [[ $? -ne 7 && $? -ne 22 && $? -ne 0 ]]; then
 		display_alert "Timeout from $server" "retrying" "info"
-		server="https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/"
+		server="https://deb.debian.org/armbian-releases/"
 
 		# switch to another china mirror if tuna timeouts
 		timeout 10 curl --location --head --fail --silent ${server}${remotedir}/${filename} 2>&1 >/dev/null
 		if [[ $? -ne 7 && $? -ne 22 && $? -ne 0 ]]; then
 			display_alert "Timeout from $server" "retrying" "info"
-			server="https://mirrors.bfsu.edu.cn/armbian-releases/"
+			server="https://mirrors.bfsu.edu.cn/armbian-releases/onecloud/"
 		fi
 	fi
 
